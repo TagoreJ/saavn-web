@@ -198,7 +198,7 @@ async function getAlbumDetails(albumId) {
                             <p id="${song_id}-ar" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_artist}<br/></p>
                             <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='PlayAudio("${download_url}","${song_id}")'>▶</button>
                             <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='AddDownload("${song_id}")'>DL</button>
-                            <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;padding-top:15px;">${play_.time}<br/></p>
+                            <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;padding-top:15px;">${play_time}<br/></p>
                         </div>
                     </div>
                 </div>
@@ -212,4 +212,19 @@ async function getAlbumDetails(albumId) {
         console.error(error);
         results_container.innerHTML = `<span class="error">Error: ${error}</span>`;
     }
+}
+
+// We need to add TextAbstract here since it's defined in saavn-search.js
+// but this file is loaded first.
+function TextAbstract(text, length) {
+    if (text == null) {
+        return "";
+    }
+    if (text.length <= length) {
+        return text;
+    }
+    text = text.substring(0, length);
+    last = text.lastIndexOf(" ");
+    text = text.substring(0, last);
+    return text + "...";
 }
