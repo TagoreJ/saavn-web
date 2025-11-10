@@ -93,8 +93,7 @@ function AddDownload(id) {
             var download_img = document.querySelector('[track_tag="'+id+'"] .track-img');
             var download_size = document.querySelector('[track_tag="'+id+'"] .track-size');
             
-            // --- FIXED CHECK ---
-            // Check if results_objects[id] and its properties exist before accessing
+            // Safety check for download info
             if (results_objects[id] && results_objects[id].track) {
                 download_name.innerHTML = results_objects[id].track.name;
                 if (results_objects[id].track.album) {
@@ -176,16 +175,17 @@ async function getAlbumDetails(albumId) {
             var song_id = track.id;
             var year = track.year;
             
-            // --- FIXED IMAGE ---
             var song_image = (track.image && track.image.length > 1) ? track.image[1].link : placeholder_image;
             
             var song_artist = TextAbstract(track.primaryArtists, 30);
             
-            var bitrate = document.getElementById('saavn-bitrate');
-            var bitrate_i = bitrate.options[bitrate.selectedIndex].value;
-            
-            // --- FIXED DOWNLOAD URL ---
-            var download_url = (track.downloadUrl && track.downloadUrl.length > bitrate_i) ? track.downloadUrl[bitrate_i].link : null;
+            // --- *** THE REAL FIX IS HERE *** ---
+            var bitrate_select = document.getElementById('saavn-bitrate');
+            var selected_quality = bitrate_select.options[bitrate_select.selectedIndex].text; // Gets "320kbps"
+
+            var download_link_object = (track.downloadUrl) ? track.downloadUrl.find(l => l.quality === selected_quality) : null;
+            var download_url = download_link_object ? download_link_object.link : null;
+            // --- *** END OF FIX *** ---
 
             if (download_url) { // Only show songs that have a valid download link
                 
@@ -218,6 +218,11 @@ async function getAlbumDetails(albumId) {
             }
         }
         results_container.innerHTML = results.join(' ');
+        
+        if(results.length === 0) {
+            results_container.innerHTML = "<p> No results found. (Some songs are hidden if they don't have a download link for your selected quality)</p>";
+        }
+        
         document.getElementById("saavn-results").scrollIntoView();
 
     } catch (error) {

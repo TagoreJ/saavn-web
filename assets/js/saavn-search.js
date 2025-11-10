@@ -1,7 +1,7 @@
 var results_container = document.querySelector("#saavn-results")
 var results_objects = {};
-var currentSearchType = 'songs'; // Add this line
-const baseUrl = "https://saavn.sumit.co/api"; // CORRECTED URL
+var currentSearchType = 'songs';
+const baseUrl = "https://saavn.sumit.co/api"; // Using your requested API
 const placeholder_image = "https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e-1be84651df.jpg"; // Fallback image
 
 // New function to handle tab clicks
@@ -19,7 +19,7 @@ function SaavnSearch() {
     var query = document.querySelector("#saavn-search-box").value.trim()
     query = encodeURIComponent(query);
 
-    if (query == lastSearch) { doSaavnSearch(query, false, false, currentSearchType) } // Pass the new type
+    if (query == lastSearch) { doSaavnSearch(query, false, false, currentSearchType) }
     window.location.hash = lastSearch;
     if (query.length > 0) {
         window.location.hash = query
@@ -31,9 +31,9 @@ function nextPage() {
     var query = document.querySelector("#saavn-search-box").value.trim();
     if (!query) { query = lastSearch; }
     query = encodeURIComponent(query);
-    doSaavnSearch(query, 0, true, currentSearchType); // Pass the new type
+    doSaavnSearch(query, 0, true, currentSearchType);
 }
-async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // Added searchType
+async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') {
     window.location.hash = query;
     document.querySelector("#saavn-search-box").value = decodeURIComponent(query);
     if (!query) { return 0; }
@@ -43,7 +43,6 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
         ; page_index = page_index + 1; query = query + "&page=" + page_index;
     } else { query = query + "&page=1"; page_index = 1; }
 
-    // try catch
     try {
         var searchUrl = `${baseUrl}/search/${searchType}?query=${query}`;
         var response = await fetch(searchUrl);
@@ -51,13 +50,15 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
         results_container.innerHTML = `<span class="error">Error: ${error} <br> Check if API is down </span>`;
     }
     var json = await response.json();
-    /* If response code isn't 200, display error*/
+    
     if (response.status !== 200) {
         results_container.innerHTML = `<span class="error">Error: ${json.message}</span>`;
         console.log(response)
         return 0;
     }
-    var json = json.data.results;
+    
+    // API data is in data.results
+    var json = json.data.results; 
     var results = [];
     if (!json) { results_container.innerHTML = "<p> No result found. Try other Library </p>"; return; }
     lastSearch = decodeURI(window.location.hash.substring(1));
@@ -82,20 +83,21 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
             var song_id = track.id;
             var year = track.year;
             
-            // --- FIXED IMAGE ---
-            // Check if image array exists and has at least 2 items
+            // Safety check for image
             var song_image = (track.image && track.image.length > 1) ? track.image[1].link : placeholder_image;
             
             var song_artist = TextAbstract(track.primaryArtists, 30);
-            var bitrate = document.getElementById('saavn-bitrate');
-            var bitrate_i = bitrate.options[bitrate.selectedIndex].value;
             
-            // --- FIXED DOWNLOAD URL ---
-            // Check if downloadUrl array exists and has the requested index
-            var download_url = (track.downloadUrl && track.downloadUrl.length > bitrate_i) ? track.downloadUrl[bitrate_i].link : null;
+            // --- *** THE REAL FIX IS HERE *** ---
+            var bitrate_select = document.getElementById('saavn-bitrate');
+            var selected_quality = bitrate_select.options[bitrate_select.selectedIndex].text; // Gets "320kbps", "160kbps", etc.
 
+            // Find the download link object that matches the selected quality
+            var download_link_object = (track.downloadUrl) ? track.downloadUrl.find(l => l.quality === selected_quality) : null;
+            var download_url = download_link_object ? download_link_object.link : null;
+            // --- *** END OF FIX *** ---
+            
             if (download_url) { // Only show songs that have a valid download link
-                // push object to results array
                 results_objects[song_id] = {
                     track: track
                 };
@@ -125,7 +127,6 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
         for (let album of json) {
             
             var album_name = TextAbstract(album.name, 25);
-            // --- FIXED IMAGE ---
             var album_image = (album.image && album.image.length > 1) ? album.image[1].link : placeholder_image;
             var album_id = album.id;
             var year = album.year;
@@ -151,6 +152,10 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
 
 
     results_container.innerHTML = results.join(' ');
+    if(results.length === 0) {
+        results_container.innerHTML = "<p> No results found. (Some songs are hidden if they don't have a download link for your selected quality)</p>";
+    }
+    
     if (!NotScroll) {
         document.getElementById("saavn-results").scrollIntoView();
     }
