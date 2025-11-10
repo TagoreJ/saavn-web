@@ -139,8 +139,8 @@ async function getAlbumDetails(albumId) {
     document.getElementById("loadmore").style.display = 'none'; // Hide "Load More"
 
     try {
-        // Use the same baseUrl from saavn-search.js
-        var response = await fetch(`https://jiosaavn-api-privatecvc2.vercel.app/albums?id=${albumId}`);
+        // CORRECTED FETCH URL
+        var response = await fetch(`https://saavn.sumit.co/api/albums?id=${albumId}`);
         var data = await response.json();
 
         if (response.status !== 200 || !data.data) {
@@ -180,7 +180,8 @@ async function getAlbumDetails(albumId) {
                 results_objects[song_id] = { 
                     track: {
                         ...track,
-                        album: { name: album.name } // Add album name for the DL function
+                        album: { name: album.name }, // Add album name for the DL function
+                        image: track.image // Ensure image is passed correctly
                     }
                 }; 
                 
@@ -197,7 +198,7 @@ async function getAlbumDetails(albumId) {
                             <p id="${song_id}-ar" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_artist}<br/></p>
                             <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='PlayAudio("${download_url}","${song_id}")'>▶</button>
                             <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='AddDownload("${song_id}")'>DL</button>
-                            <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;padding-top:15px;">${play_time}<br/></p>
+                            <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;padding-top:15px;">${play_.time}<br/></p>
                         </div>
                     </div>
                 </div>
@@ -211,19 +212,4 @@ async function getAlbumDetails(albumId) {
         console.error(error);
         results_container.innerHTML = `<span class="error">Error: ${error}</span>`;
     }
-}
-
-// We need to add TextAbstract here since it's defined in saavn-search.js
-// and not accessible in functions.js
-function TextAbstract(text, length) {
-    if (text == null) {
-        return "";
-    }
-    if (text.length <= length) {
-        return text;
-    }
-    text = text.substring(0, length);
-    last = text.lastIndexOf(" ");
-    text = text.substring(0, last);
-    return text + "...";
 }

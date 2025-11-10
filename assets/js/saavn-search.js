@@ -1,7 +1,7 @@
 var results_container = document.querySelector("#saavn-results")
 var results_objects = {};
 var currentSearchType = 'songs'; // Add this line
-const baseUrl = "https://jiosaavn-api-privatecvc2.vercel.app"; // Changed this line
+const baseUrl = "https://saavn.sumit.co/api"; // CORRECTED URL
 
 // New function to handle tab clicks
 function setSearchType(type) {
@@ -37,7 +37,8 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
     document.querySelector("#saavn-search-box").value = decodeURIComponent(query);
     if (!query) { return 0; }
     results_container.innerHTML = `<span class="loader">Searching</span>`;
-    query = query + "&limit=40";
+    // The original file used 'limit=' but the API docs show 'count='. Let's stick to the working 'limit' for now.
+    query = query + "&limit=40"; 
     if (page) {
         ; page_index = page_index + 1; query = query + "&page=" + page_index;
     } else { query = query + "&page=1"; page_index = 1; }
@@ -45,6 +46,7 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
     // try catch
     try {
         // Build the URL based on searchType
+        // The new API uses /search/songs, /search/albums, etc.
         var searchUrl = `${baseUrl}/search/${searchType}?query=${query}`;
         var response = await fetch(searchUrl);
     } catch (error) {
@@ -57,7 +59,8 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
         console.log(response)
         return 0;
     }
-    var json = json.data.results;
+    // The new API has data in data.results
+    var json = json.data.results; 
     var results = [];
     if (!json) { results_container.innerHTML = "<p> No result found. Try other Library </p>"; return; }
     lastSearch = decodeURI(window.location.hash.substring(1));
@@ -124,7 +127,8 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
             var album_image = album.image[1].link;
             var album_id = album.id;
             var year = album.year;
-            var album_artist = TextAbstract(album.primaryArtists, 30);
+            // API uses 'primaryArtists' for albums too
+            var album_artist = TextAbstract(album.primaryArtists, 30); 
 
             results.push(`
                 <div class="text-left song-container" style="margin-bottom:20px;border-radius:10px;background-color:#1c1c1c;padding:10px;">
@@ -175,14 +179,5 @@ onhashchange = event => { doSaavnSearch(window.location.hash.substring(1), false
 // If Bitrate changes, search again
 $('#saavn-bitrate').on('change', function () {
     doSaavnSearch(lastSearch, false, false, currentSearchType); // Pass type
-    /*
-    var isDirty = !this.options[this.selectedIndex].defaultSelected;
-
-    if (isDirty) {
-        // Value Changed
-        doSaavnSearch(lastSearch)
-    } else {
-        // Do Nothing
-    } */
 });
 document.getElementById("loadmore").addEventListener('click', nextPage)
