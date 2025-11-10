@@ -242,14 +242,11 @@ async function getAlbumSongs(albumId) {
             var quality = "";
             if (bitrate_i == 4) { quality = 320 } else { quality = 160; }
             
-            results_objects[song_id] = {
-                // Store track data for the download function
-                track: {
-                    name: track.name,
-                    album: { name: albumName },
-                    image: track.image
-                }
-            };
+            // ===================================
+            // === THIS IS THE CORRECTED LINE ====
+            // ===================================
+            results_objects[song_id] = { track: track };
+            
             results.push(`
             <div class="text-left song-container" style="margin-bottom:20px;border-radius:10px;background-color:#1c1c1c;padding:10px;">
             <div class="row" style="margin:auto;">
@@ -261,16 +258,4 @@ async function getAlbumSongs(albumId) {
                     <p id="${song_id}-n" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_name}</p>
                     <p id="${song_id}-a" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${album_name}<br/></p>
                     <p id="${song_id}-ar" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_artist}<br/></p>
-                    <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='PlayAudio("${download_url}","${song_id}")'>▶</button>
-                    <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='AddDownload("${song_id}")'>DL</button>
-                    <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:11px;padding-top:15px;">${play_time}<br/></p>
-                </div>
-            </div>
-        </div>
-        `);
-        }
-    }
-
-    results_container.innerHTML = results.join(' ');
-    document.getElementById("saavn-results").scrollIntoView();
-}
+                    <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='PlayAudio("${download_
