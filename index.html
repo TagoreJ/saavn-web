@@ -1,10 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!--
-Developer : wiz64 ,
-Contribute: https://github.com/wiz64/saavn-web-ui ,
-Don't forget to star the repo
--->
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
@@ -52,6 +47,11 @@ Don't forget to star the repo
                     <p class="text-center" style="padding: 0px 5px;"></p>
                     <div class="container" style="padding: 0px;">
                         <div class="intro">
+                            
+                            <div class="search-tabs-container">
+                                <div class="search-tab active" id="search-type-songs" onclick="setSearchType('songs')">Songs</div>
+                                <div class="search-tab" id="search-type-albums" onclick="setSearchType('albums')">Albums</div>
+                            </div>
                             <form class="text-center" action="#" method="get">
                                 <div style="width: 95%;margin: auto;padding: 3px;" placeholder="Enter Song, Artist or Album name"><input class="form-control float-left fit-content" type="text" id="saavn-search-box" style="margin: 0px;color: var(--gray-dark);max-width: 100%;width: 75%;" placeholder="Enter Name, Year, Artist"><button class="btn btn-primary" id="saavn-search-trigger" type="submit" style="text-align: center;" onclick="SaavnSearch()">Search</button></div>
                                 <h5 class="text-uppercase text-center" style="color: rgb(165,255,184);">Results</h5>
@@ -93,7 +93,7 @@ Don't forget to star the repo
     <div id="audio-player" style="z-index: 99;background: #ffffff33; width: 100%;margin: 0px;color: var(--light);backdrop-filter: blur(4px);border-top-left-radius: 10px;border-top-right-radius: 20px;">
         <div class="row" style="margin: 0px;">
             <div class="col-auto fit-content" style="padding: 0px;">
-                <img class="img-fluid d-inline" id="player-image" style="height: 75px;width: 75px;border-radius: 10px;" src="https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e1be84651df.jpg" loading="lazy">
+                <img class="img-fluid d-inline" id="player-image" style="height: 75px;width: 75px;border-radius: 10px;" src="https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e-1be84651df.jpg" loading="lazy">
             </div>
             <div class="col fit-content" style="padding: 0px;">
                 <div style="max-height: 24px;max-width: 95%;word-wrap: normal; padding-left: 20px;"><span id="player-name">Song</span><span><br></span><span id="player-album">Album</span></div><br>
@@ -104,9 +104,7 @@ Don't forget to star the repo
             </div>
         </div>
     </div>
-    <!-- floating downloader popup -->
     <div class=”float-button” style="width:30px; height:30px; border-radius:50%; background-color:#fff; box-shadow: 0 0 10px #000; cursor:pointer; position:fixed;top:50px; right:20px; z-index:9999;">
-    <!-- download icon -->
     <a href="javascript:void(0);" class="btn btn-primary" id="mpopupLink">
     <img src="https://img.icons8.com/ios/50/000000/download.png">
     </a></div>
@@ -178,9 +176,7 @@ Don't forget to star the repo
   margin: 0; /* Remove margins */
 }
     </style>
-    <!-- Modal popup box -->
-<div id="mpopupBox" class="mpopup">
-    <!-- Modal content -->
+    <div id="mpopupBox" class="mpopup">
     <div class="modal-content">
     
         <div class="modal-header" style="display:inline;">
@@ -188,28 +184,9 @@ Don't forget to star the repo
             <h2>Downloads</h2>
         </div>
         <div class="modal-body">
-            <!-- list of songs, with a small cover art pic, name, album name -->
             <row>
             <ul id="download-list" class="nobullets">
-                    <!--<li>
-                    <div class="col">
-                        
-                        <img id="download-cover" src="https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e1be84651df.jpg" width="50px">
-                        <div style="display: inline;">
-                        <span id="download-name">Song</span>
-                        <span id="download-album">Album</span>
-                        <br>
-                        <span id="download-size">Size</span>
-                        <span id="download-status" style="color:green">Compiling.</span>
-                        </div>
-                    </div>
-                    <hr>
-                    </li>-->
-                    
-
-
-                
-                </ul></row>
+                    </ul></row>
         </div>
         <div class="modal-footer" style="text-align: center;">
             <p>Don't flood the Media Server, Have patience...</p>
@@ -248,7 +225,7 @@ Don't forget to star the repo
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/functions.js"></script>
-    <script src="assets/js/saavn-search.js"></script>
+    <script src="assets.js/saavn-search.js"></script>
 </body>
 
 </html>

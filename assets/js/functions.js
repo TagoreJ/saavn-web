@@ -129,3 +129,101 @@ function AddDownload(id) {
                   }}
               });}, 3000); // end interval
         } });}
+
+// --- NEW FUNCTIONS START HERE ---
+
+// New function to fetch and display songs from an album
+async function getAlbumDetails(albumId) {
+    var results_container = document.querySelector("#saavn-results");
+    results_container.innerHTML = `<span class="loader">Loading album...</span>`;
+    document.getElementById("loadmore").style.display = 'none'; // Hide "Load More"
+
+    try {
+        // Use the same baseUrl from saavn-search.js
+        var response = await fetch(`https://jiosaavn-api-privatecvc2.vercel.app/albums?id=${albumId}`);
+        var data = await response.json();
+
+        if (response.status !== 200 || !data.data) {
+            results_container.innerHTML = `<span class="error">Error: Could not load album.</span>`;
+            return;
+        }
+
+        var album = data.data;
+        var songs = album.songs;
+        var results = [];
+        results_objects = {}; // Clear previous results
+
+        // We can reuse the song card logic from saavn-search.js
+        for (let track of songs) {
+            var song_name = TextAbstract(track.name, 25);
+            var album_name = TextAbstract(album.name, 20); // Use album name
+            if (album.name == track.name) album_name = "";
+
+            var measuredTime = new Date(null);
+            measuredTime.setSeconds(track.duration);
+            var play_time = measuredTime.toISOString().substr(11, 8);
+            if (play_time.startsWith("00:0")) play_time = play_time.slice(4);
+            if (play_time.startsWith("00:")) play_time = play_time.slice(3);
+
+            var song_id = track.id;
+            var year = track.year;
+            var song_image = track.image[1].link;
+            var song_artist = TextAbstract(track.primaryArtists, 30);
+            
+            var bitrate = document.getElementById('saavn-bitrate');
+            var bitrate_i = bitrate.options[bitrate.selectedIndex].value;
+            if (track.downloadUrl) {
+                var download_url = track.downloadUrl[bitrate_i]['link'];
+                
+                // Add song to results_objects so "DL" button works
+                // We need to create a "track" object matching the search results structure
+                results_objects[song_id] = { 
+                    track: {
+                        ...track,
+                        album: { name: album.name } // Add album name for the DL function
+                    }
+                }; 
+                
+                results.push(`
+                <div class="text-left song-container" style="margin-bottom:20px;border-radius:10px;background-color:#1c1c1c;padding:10px;">
+                    <div class="row" style="margin:auto;">
+                        <div class="col-auto" style="padding:0px;padding-right:0px;border-style:none;">
+                            <img id="${song_id}-i" class="img-fluid d-inline" style="width:115px;border-radius:5px;height:115px;padding-right:10px;" src="${song_image}" loading="lazy"/>
+                        </div>
+                        <div class="col" style="border-style:none;padding:2px;">
+                            <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;">${year}</p>
+                            <p id="${song_id}-n" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_name}</p>
+                            <p id="${song_id}-a" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${album_name}<br/></p>
+                            <p id="${song_id}-ar" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_artist}<br/></p>
+                            <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='PlayAudio("${download_url}","${song_id}")'>▶</button>
+                            <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='AddDownload("${song_id}")'>DL</button>
+                            <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;padding-top:15px;">${play_time}<br/></p>
+                        </div>
+                    </div>
+                </div>
+                `);
+            }
+        }
+        results_container.innerHTML = results.join(' ');
+        document.getElementById("saavn-results").scrollIntoView();
+
+    } catch (error) {
+        console.error(error);
+        results_container.innerHTML = `<span class="error">Error: ${error}</span>`;
+    }
+}
+
+// We need to add TextAbstract here since it's defined in saavn-search.js
+// and not accessible in functions.js
+function TextAbstract(text, length) {
+    if (text == null) {
+        return "";
+    }
+    if (text.length <= length) {
+        return text;
+    }
+    text = text.substring(0, length);
+    last = text.lastIndexOf(" ");
+    text = text.substring(0, last);
+    return text + "...";
+}

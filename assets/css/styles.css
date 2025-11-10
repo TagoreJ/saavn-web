@@ -126,3 +126,30 @@ footer {
 .error {
  margin : 20px;
 }
+
+
+
+/* -- CSS for Search Tabs -- */
+.search-tabs-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.search-tab {
+  color: #fff;
+  padding: 8px 20px;
+  border: 1px solid #fff;
+  border-radius: 20px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.search-tab.active {
+  background: #fff;
+  color: #000;
+  opacity: 1;
+  font-weight: bold;
+}
+/* -- End of CSS for Search Tabs -- */
