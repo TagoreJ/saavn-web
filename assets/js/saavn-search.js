@@ -1,7 +1,7 @@
 var results_container = document.querySelector("#saavn-results")
 var results_objects = {};
-// 1. UPDATED: Changed to baseApiUrl
-const baseApiUrl = "https://jiosaavn-api-privatecvc2.vercel.app/api";
+// 1. UPDATED: Changed to the official documented API URL
+const baseApiUrl = "https://saavn.sumit.co/api";
 
 function SaavnSearch() {
 event.preventDefault(); // stop page changing to #, which will reload the page
@@ -23,7 +23,7 @@ function nextPage() {
     doSaavnSearch(query,0,true)
 }
 
-// 2. REPLACED: This entire function is updated
+// 2. This function remains the same as before
 async function doSaavnSearch(query, NotScroll, page) {
     window.location.hash = query;
     document.querySelector("#saavn-search-box").value = decodeURIComponent(query);
@@ -106,7 +106,7 @@ async function doSaavnSearch(query, NotScroll, page) {
                         <p id="${song_id}-ar" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_artist}<br/></p>
                         <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='PlayAudio("${download_url}","${song_id}")'>▶</button>
                         <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='AddDownload("${song_id}")'>DL</button>
-                        <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;padding-top:15px;">${play_time}<br/></p>
+                        <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:11px;padding-top:15px;">${play_time}<br/></p>
                     </div>
                 </div>
             </div>
@@ -192,7 +192,7 @@ $('#saavn-bitrate').on('change', function () {
 document.getElementById("loadmore").addEventListener('click',nextPage)
 
 
-// 3. ADDED: This is the new function to get songs from an album
+// 3. This new function also remains the same
 async function getAlbumSongs(albumId) {
     results_container.innerHTML = `<span class="loader">Loading Songs...</span>`;
 
@@ -263,7 +263,7 @@ async function getAlbumSongs(albumId) {
                     <p id="${song_id}-ar" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_artist}<br/></p>
                     <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='PlayAudio("${download_url}","${song_id}")'>▶</button>
                     <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='AddDownload("${song_id}")'>DL</button>
-                    <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;padding-top:15px;">${play_time}<br/></p>
+                    <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:11px;padding-top:15px;">${play_time}<br/></p>
                 </div>
             </div>
         </div>
