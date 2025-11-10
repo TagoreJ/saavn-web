@@ -50,7 +50,7 @@ function AddDownload(id) {
            <li>
                     <div class="col">
                         
-                        <img src="https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e1be84651df.jpg" width="50px">
+                        <img src="https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e-1be84651df.jpg" width="50px">
                         <div style="display: inline;">
                         <span id="download-name">Song</span>
                         <span id="download-album">Album</span>
@@ -92,12 +92,20 @@ function AddDownload(id) {
             var download_album = document.querySelector('[track_tag="'+id+'"] .track-album');
             var download_img = document.querySelector('[track_tag="'+id+'"] .track-img');
             var download_size = document.querySelector('[track_tag="'+id+'"] .track-size');
-            // set text content to song name and album name
             
-            download_name.innerHTML= results_objects[id].track.name;
+            // --- FIXED CHECK ---
+            // Check if results_objects[id] and its properties exist before accessing
+            if (results_objects[id] && results_objects[id].track) {
+                download_name.innerHTML = results_objects[id].track.name;
+                if (results_objects[id].track.album) {
+                    download_album.innerHTML = results_objects[id].track.album.name;
+                }
+                if (results_objects[id].track.image && results_objects[id].track.image.length > 2) {
+                    download_img.setAttribute("src", results_objects[id].track.image[2].link);
+                }
+            }
             download_status_span.innerHTML = data.status;
-            download_album.innerHTML = results_objects[id].track.album.name;
-            download_img.setAttribute("src",results_objects[id].track.image[2].link);
+
             
             // change mpopupLink background and border color to green and back to blue after 1 second
             var float_tap = document.getElementById('mpopupLink');
@@ -132,6 +140,8 @@ function AddDownload(id) {
 
 // --- NEW FUNCTIONS START HERE ---
 
+const placeholder_image = "https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e-1be84651df.jpg"; // Fallback image
+
 // New function to fetch and display songs from an album
 async function getAlbumDetails(albumId) {
     var results_container = document.querySelector("#saavn-results");
@@ -139,7 +149,6 @@ async function getAlbumDetails(albumId) {
     document.getElementById("loadmore").style.display = 'none'; // Hide "Load More"
 
     try {
-        // CORRECTED FETCH URL
         var response = await fetch(`https://saavn.sumit.co/api/albums?id=${albumId}`);
         var data = await response.json();
 
@@ -153,7 +162,6 @@ async function getAlbumDetails(albumId) {
         var results = [];
         results_objects = {}; // Clear previous results
 
-        // We can reuse the song card logic from saavn-search.js
         for (let track of songs) {
             var song_name = TextAbstract(track.name, 25);
             var album_name = TextAbstract(album.name, 20); // Use album name
@@ -167,21 +175,25 @@ async function getAlbumDetails(albumId) {
 
             var song_id = track.id;
             var year = track.year;
-            var song_image = track.image[1].link;
+            
+            // --- FIXED IMAGE ---
+            var song_image = (track.image && track.image.length > 1) ? track.image[1].link : placeholder_image;
+            
             var song_artist = TextAbstract(track.primaryArtists, 30);
             
             var bitrate = document.getElementById('saavn-bitrate');
             var bitrate_i = bitrate.options[bitrate.selectedIndex].value;
-            if (track.downloadUrl) {
-                var download_url = track.downloadUrl[bitrate_i]['link'];
+            
+            // --- FIXED DOWNLOAD URL ---
+            var download_url = (track.downloadUrl && track.downloadUrl.length > bitrate_i) ? track.downloadUrl[bitrate_i].link : null;
+
+            if (download_url) { // Only show songs that have a valid download link
                 
-                // Add song to results_objects so "DL" button works
-                // We need to create a "track" object matching the search results structure
                 results_objects[song_id] = { 
                     track: {
                         ...track,
-                        album: { name: album.name }, // Add album name for the DL function
-                        image: track.image // Ensure image is passed correctly
+                        album: { name: album.name }, 
+                        image: track.image 
                     }
                 }; 
                 
@@ -214,8 +226,6 @@ async function getAlbumDetails(albumId) {
     }
 }
 
-// We need to add TextAbstract here since it's defined in saavn-search.js
-// but this file is loaded first.
 function TextAbstract(text, length) {
     if (text == null) {
         return "";

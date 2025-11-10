@@ -2,6 +2,7 @@ var results_container = document.querySelector("#saavn-results")
 var results_objects = {};
 var currentSearchType = 'songs'; // Add this line
 const baseUrl = "https://saavn.sumit.co/api"; // CORRECTED URL
+const placeholder_image = "https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e-1be84651df.jpg"; // Fallback image
 
 // New function to handle tab clicks
 function setSearchType(type) {
@@ -37,16 +38,13 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
     document.querySelector("#saavn-search-box").value = decodeURIComponent(query);
     if (!query) { return 0; }
     results_container.innerHTML = `<span class="loader">Searching</span>`;
-    // The original file used 'limit=' but the API docs show 'count='. Let's stick to the working 'limit' for now.
-    query = query + "&limit=40"; 
+    query = query + "&limit=40";
     if (page) {
         ; page_index = page_index + 1; query = query + "&page=" + page_index;
     } else { query = query + "&page=1"; page_index = 1; }
 
     // try catch
     try {
-        // Build the URL based on searchType
-        // The new API uses /search/songs, /search/albums, etc.
         var searchUrl = `${baseUrl}/search/${searchType}?query=${query}`;
         var response = await fetch(searchUrl);
     } catch (error) {
@@ -59,16 +57,13 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
         console.log(response)
         return 0;
     }
-    // The new API has data in data.results
-    var json = json.data.results; 
+    var json = json.data.results;
     var results = [];
     if (!json) { results_container.innerHTML = "<p> No result found. Try other Library </p>"; return; }
     lastSearch = decodeURI(window.location.hash.substring(1));
 
-    // Check which type of results we are rendering
     if (searchType === 'songs') {
         for (let track of json) {
-
 
             song_name = TextAbstract(track.name, 25);
             album_name = TextAbstract(track.album.name, 20);
@@ -86,14 +81,20 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
             }
             var song_id = track.id;
             var year = track.year;
-            var song_image = track.image[1].link;
+            
+            // --- FIXED IMAGE ---
+            // Check if image array exists and has at least 2 items
+            var song_image = (track.image && track.image.length > 1) ? track.image[1].link : placeholder_image;
+            
             var song_artist = TextAbstract(track.primaryArtists, 30);
             var bitrate = document.getElementById('saavn-bitrate');
             var bitrate_i = bitrate.options[bitrate.selectedIndex].value;
-            if (track.downloadUrl) {
-                var download_url = track.downloadUrl[bitrate_i]['link'];
-                var quality = "";
-                if (bitrate_i == 4) { quality = 320 } else { quality = 160; }
+            
+            // --- FIXED DOWNLOAD URL ---
+            // Check if downloadUrl array exists and has the requested index
+            var download_url = (track.downloadUrl && track.downloadUrl.length > bitrate_i) ? track.downloadUrl[bitrate_i].link : null;
+
+            if (download_url) { // Only show songs that have a valid download link
                 // push object to results array
                 results_objects[song_id] = {
                     track: track
@@ -119,15 +120,15 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
                 );
             }
         }
-    } // --- ADD THIS NEW BLOCK FOR ALBUMS ---
+    }
     else if (searchType === 'albums') {
         for (let album of json) {
-            // Create HTML for an album card
+            
             var album_name = TextAbstract(album.name, 25);
-            var album_image = album.image[1].link;
+            // --- FIXED IMAGE ---
+            var album_image = (album.image && album.image.length > 1) ? album.image[1].link : placeholder_image;
             var album_id = album.id;
             var year = album.year;
-            // API uses 'primaryArtists' for albums too
             var album_artist = TextAbstract(album.primaryArtists, 30); 
 
             results.push(`
@@ -147,7 +148,6 @@ async function doSaavnSearch(query, NotScroll, page, searchType = 'songs') { // 
                 `);
         }
     }
-    // --- END OF NEW ALBUM BLOCK ---
 
 
     results_container.innerHTML = results.join(' ');
@@ -170,14 +170,13 @@ function TextAbstract(text, length) {
     return text + "...";
 }
 if (window.location.hash) {
-    doSaavnSearch(window.location.hash.substring(1), false, false, currentSearchType); // Pass type
-} else { doSaavnSearch('english', 1, false, currentSearchType); } // Pass type
+    doSaavnSearch(window.location.hash.substring(1), false, false, currentSearchType); 
+} else { doSaavnSearch('english', 1, false, currentSearchType); }
 
 addEventListener('hashchange', event => { });
-onhashchange = event => { doSaavnSearch(window.location.hash.substring(1), false, false, currentSearchType) }; // Pass type
+onhashchange = event => { doSaavnSearch(window.location.hash.substring(1), false, false, currentSearchType) }; 
 
-// If Bitrate changes, search again
 $('#saavn-bitrate').on('change', function () {
-    doSaavnSearch(lastSearch, false, false, currentSearchType); // Pass type
+    doSaavnSearch(lastSearch, false, false, currentSearchType); 
 });
 document.getElementById("loadmore").addEventListener('click', nextPage)
