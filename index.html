@@ -1,10 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!--
-Developer : wiz64 ,
-Contribute: https://github.com/wiz64/saavn-web-ui ,
-Don't forget to star the repo
--->
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
@@ -53,6 +48,13 @@ Don't forget to star the repo
                     <div class="container" style="padding: 0px;">
                         <div class="intro">
                             <form class="text-center" action="#" method="get">
+                                <div style="color: #fff; margin-bottom: 10px;">
+                                    <input type="radio" id="search-type-song" name="search-type" value="songs" checked>
+                                    <label for="search-type-song">Search Songs</label>
+                                    
+                                    <input type="radio" id="search-type-album" name="search-type" value="albums" style="margin-left: 20px;">
+                                    <label for="search-type-album">Search Albums</label>
+                                </div>
                                 <div style="width: 95%;margin: auto;padding: 3px;" placeholder="Enter Song, Artist or Album name"><input class="form-control float-left fit-content" type="text" id="saavn-search-box" style="margin: 0px;color: var(--gray-dark);max-width: 100%;width: 75%;" placeholder="Enter Name, Year, Artist"><button class="btn btn-primary" id="saavn-search-trigger" type="submit" style="text-align: center;" onclick="SaavnSearch()">Search</button></div>
                                 <h5 class="text-uppercase text-center" style="color: rgb(165,255,184);">Results</h5>
                             </form>
@@ -104,9 +106,7 @@ Don't forget to star the repo
             </div>
         </div>
     </div>
-    <!-- floating downloader popup -->
     <div class=”float-button” style="width:30px; height:30px; border-radius:50%; background-color:#fff; box-shadow: 0 0 10px #000; cursor:pointer; position:fixed;top:50px; right:20px; z-index:9999;">
-    <!-- download icon -->
     <a href="javascript:void(0);" class="btn btn-primary" id="mpopupLink">
     <img src="https://img.icons8.com/ios/50/000000/download.png">
     </a></div>
@@ -178,9 +178,7 @@ Don't forget to star the repo
   margin: 0; /* Remove margins */
 }
     </style>
-    <!-- Modal popup box -->
-<div id="mpopupBox" class="mpopup">
-    <!-- Modal content -->
+    <div id="mpopupBox" class="mpopup">
     <div class="modal-content">
     
         <div class="modal-header" style="display:inline;">
@@ -188,28 +186,9 @@ Don't forget to star the repo
             <h2>Downloads</h2>
         </div>
         <div class="modal-body">
-            <!-- list of songs, with a small cover art pic, name, album name -->
             <row>
             <ul id="download-list" class="nobullets">
-                    <!--<li>
-                    <div class="col">
-                        
-                        <img id="download-cover" src="https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e1be84651df.jpg" width="50px">
-                        <div style="display: inline;">
-                        <span id="download-name">Song</span>
-                        <span id="download-album">Album</span>
-                        <br>
-                        <span id="download-size">Size</span>
-                        <span id="download-status" style="color:green">Compiling.</span>
-                        </div>
-                    </div>
-                    <hr>
-                    </li>-->
-                    
-
-
-                
-                </ul></row>
+                    </ul></row>
         </div>
         <div class="modal-footer" style="text-align: center;">
             <p>Don't flood the Media Server, Have patience...</p>
